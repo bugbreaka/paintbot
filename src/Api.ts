@@ -41,9 +41,13 @@ async function httpPost(
 
   if (response?.status === 200 && responseData !== null) {
     return responseData
+  } else if (response?.status === 204) {
+    return ''
   } else {
     throw Error(
-      `${errorMsg}: ${responseData !== null ? responseData : 'Unknown error.'}`,
+      `${errorMsg}: (${response?.status}) ${
+        responseData !== null ? responseData : 'Unknown error.'
+      }`,
     )
   }
 }

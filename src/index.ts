@@ -51,7 +51,7 @@ function positionsAreEqual(a: Position, b: Position | undefined): boolean {
 export async function main() {
   const configFilePath = 'botConfig.cfg'
   let bot = await registerBot('Bob', configFilePath)
-  console.log(`Registered bot: ${bot.name} with id: ${bot.id}`)
+  console.log(`Registered bot "${bot.name}" with id: ${bot.id}`)
 
   bot = await info(bot)
 
@@ -101,6 +101,8 @@ export async function main() {
   )
 
   await deregisterBot(bot, configFilePath)
+
+  console.log('Bot said bye (^_^)')
 }
 
 await main()

@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "strict": true
+  },
+  "imports": {
+    "fs/": "https://deno.land/std@0.187.0/fs/"
+  },
+  "tasks": {
+    "start": "deno run --allow-env=PAINTBOTS_URL --allow-read=botConfig.cfg --allow-write=botConfig.cfg --allow-net src/index.ts",
+    "lint": "deno lint src/",
+    "fmt": "deno fmt src/"
+  },
+  "lint": {
+    "include": ["src/"],
+    "exclude": ["src/testdata/"],
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-unused-vars"]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "semiColons": false,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "include": ["src/"],
+    "exclude": ["src/testdata/"]
+  },
+  "test": {
+    "include": ["src/"],
+    "exclude": ["src/testdata/"]
+  }
+}

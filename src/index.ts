@@ -7,18 +7,18 @@ import {
 import { Bot, Position } from './types.ts'
 import { color, info, look, paint } from './Api.ts'
 
-function* circleGenerator(
+function* getCircleCircumferencePositions(
   center: Position,
   radius: number,
 ): Generator<Position> {
   const twoPi = Math.PI * 2
   for (let i = 0; i <= twoPi; i += 0.1) {
-    const point = {
+    const position = {
       x: center.x + Math.round(radius * Math.cos(i)),
       y: center.y + Math.round(radius * Math.sin(i)),
     }
 
-    yield point
+    yield position
   }
 }
 
@@ -28,13 +28,13 @@ async function drawCircle(
   radius: number,
 ): Promise<Bot> {
   let result = bot
-  for (const point of circleGenerator(center, radius)) {
+  for (const position of getCircleCircumferencePositions(center, radius)) {
     if (result.position === undefined) {
       break
     }
 
-    result = await color(result, point.x < center.x ? 'e' : 'd')
-    result = await moveBotToPosition(result, point)
+    result = await color(result, position.x < center.x ? 'e' : 'd')
+    result = await moveBotToPosition(result, position)
     await paint(result)
   }
 
@@ -65,35 +65,35 @@ export async function main() {
   //process.exit(0); return;
 
   bot = await color(bot, 'd')
-  const drawMode: 'CIRCLES' | 'POINTS' | null = 'CIRCLES'
+  const drawMode: 'CIRCLES' | 'POSITIONS' | null = 'CIRCLES'
   const maxRadius = 15
   const twoPi = Math.PI * 2
   const halfHeight = Math.round(canvas.height / 2)
   const quarterHeight = Math.round(canvas.height / 4)
-  let previousPoint: Position | undefined = undefined
-  let point: Position | undefined = undefined
+  let previousPosition: Position | undefined = undefined
+  let position: Position | undefined = undefined
   for (let i = 0; i <= twoPi; i += 0.1) {
-    point = {
+    position = {
       x: Math.round((i / twoPi) * canvas.width),
       y: Math.round(quarterHeight * Math.sin(i)) + halfHeight,
     }
-    //console.log(point)
+    //console.log(position)
 
-    if (!positionsAreEqual(point, previousPoint)) {
-      bot = await moveBotToPosition(bot, point)
+    if (!positionsAreEqual(position, previousPosition)) {
+      bot = await moveBotToPosition(bot, position)
 
       if (drawMode === 'CIRCLES') {
         bot = await drawCircle(
           bot,
-          point,
+          position,
           Math.abs(Math.round(Math.sin(i) * maxRadius)) + 5,
         )
-      } else if (drawMode === 'POINTS') {
+      } else if (drawMode === 'POSITIONS') {
         bot = await paint(bot)
       }
     }
 
-    previousPoint = point
+    previousPosition = position
   }
 
   console.log(

@@ -1,6 +1,7 @@
 import {
   Bot,
   BotCommand,
+  BotIdentity,
   CanvasDimensions,
   Color,
   Direction,
@@ -52,6 +53,10 @@ async function httpPost(
   }
 }
 
+function isInteger(v: any): v is number {
+  return Number.isInteger(v)
+}
+
 function parsePixelResponse(response: string): Pixel {
   const params = new URLSearchParams(response)
   let color, x, y
@@ -68,7 +73,7 @@ function parsePixelResponse(response: string): Pixel {
     y = parseInt(<string> params.get('y'))
   }
 
-  if (!color || x === undefined || y === undefined) {
+  if (!color || !isInteger(x) || !isInteger(y)) {
     throw Error(`Unable to parse pixel response (${color}, ${x}, ${y})!`)
   }
 
@@ -76,7 +81,7 @@ function parsePixelResponse(response: string): Pixel {
 }
 
 async function apiCommand(
-  bot: Bot,
+  bot: BotIdentity,
   command: BotCommand,
   errorMsg: string,
 ): Promise<Bot> {
@@ -106,31 +111,31 @@ export function register(name: string): Promise<string> {
   return httpPost({ register: name }, 'Failed to register')
 }
 
-export function info(bot: Bot): Promise<Bot> {
+export function info(bot: BotIdentity): Promise<Bot> {
   return apiCommand(bot, { id: bot.id, info: '' }, 'Failed to get info')
 }
 
-export function move(bot: Bot, dir: Direction): Promise<Bot> {
+export function move(bot: BotIdentity, dir: Direction): Promise<Bot> {
   return apiCommand(bot, { id: bot.id, move: dir }, 'Failed to move bot')
 }
 
-export function paint(bot: Bot): Promise<Bot> {
+export function paint(bot: BotIdentity): Promise<Bot> {
   return apiCommand(bot, { id: bot.id, paint: '' }, 'Failed to paint')
 }
 
-export function color(bot: Bot, color: Color): Promise<Bot> {
+export function color(bot: BotIdentity, color: Color): Promise<Bot> {
   return apiCommand(bot, { id: bot.id, color }, 'Failed to set color')
 }
 
-export function msg(bot: Bot, msg: string): Promise<Bot> {
+export function msg(bot: BotIdentity, msg: string): Promise<Bot> {
   return apiCommand(bot, { id: bot.id, msg }, 'Failed to send message')
 }
 
-export function clear(bot: Bot): Promise<Bot> {
+export function clear(bot: BotIdentity): Promise<Bot> {
   return apiCommand(bot, { id: bot.id, clear: '' }, 'Failed to clear pixel')
 }
 
-export async function look(bot: Bot): Promise<CanvasDimensions> {
+export async function look(bot: BotIdentity): Promise<CanvasDimensions> {
   const rawData: string = await httpPost(
     { id: bot.id, look: '' },
     'Failed to look',
@@ -143,9 +148,9 @@ export async function look(bot: Bot): Promise<CanvasDimensions> {
   }
 }
 
-export function bye(bot: Bot): Promise<string> {
+export function bye(bot: BotIdentity): Promise<string> {
   return httpPost({ id: bot.id, bye: '' }, 'Failed to bye')
 }
-export function bots(bot: Bot): Promise<string> {
+export function bots(bot: BotIdentity): Promise<string> {
   return httpPost({ id: bot.id, bots: '' }, 'Failed to get bots')
 }

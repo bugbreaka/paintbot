@@ -3,11 +3,14 @@ export interface Position {
   readonly y: number
 }
 
-export interface Bot {
+export interface BotIdentity {
   readonly id: string
   readonly name: string
-  readonly color?: string
-  readonly position?: Position
+}
+
+export type Bot = BotIdentity & {
+  readonly color: string
+  readonly position: Position
 }
 
 export interface CanvasDimensions {

@@ -1,12 +1,18 @@
 import { exists as fileExists } from 'fs/mod.ts'
-import { Bot, CanvasDimensions, Direction, Position } from './types.ts'
-import { bye, move, register } from './Api.ts'
+import {
+  Bot,
+  BotIdentity,
+  CanvasDimensions,
+  Direction,
+  Position,
+} from './types.ts'
+import { bye, info, move, register } from './Api.ts'
 
 async function storeBotConfig(
   botName: string,
   id: string,
   configFilePath: string,
-): Promise<Bot> {
+): Promise<BotIdentity> {
   await Deno.writeTextFile(configFilePath, `${botName}:${id}`)
 
   return {
@@ -19,7 +25,9 @@ async function removeBotConfig(configFilePath: string): Promise<void> {
   await Deno.remove(configFilePath)
 }
 
-async function loadBotConfig(configFilePath: string): Promise<Bot | undefined> {
+async function loadBotConfig(
+  configFilePath: string,
+): Promise<BotIdentity | undefined> {
   const exists = await fileExists(configFilePath)
 
   if (exists) {
@@ -45,20 +53,25 @@ export async function registerBot(
   configFilePath: string,
 ): Promise<Bot> {
   const config = await loadBotConfig(configFilePath)
-  let id
 
+  let botIdentity: BotIdentity
   if (config && config.name === botName) {
-    id = config.id
+    botIdentity = {
+      name: botName,
+      id: config.id,
+    }
+
+    console.log(`Loaded bot "${botIdentity.name}" with id: ${botIdentity.id}`)
   } else {
-    id = await register(botName)
+    const id = await register(botName)
+    botIdentity = await storeBotConfig(botName, id, configFilePath)
 
-    await storeBotConfig(botName, id, configFilePath)
+    console.log(
+      `Registered bot "${botIdentity.name}" with id: ${botIdentity.id}`,
+    )
   }
 
-  return {
-    name: botName,
-    id,
-  }
+  return info(botIdentity)
 }
 
 export async function deregisterBot(
@@ -94,9 +107,6 @@ export async function moveBotToPosition(
   position: Position,
 ): Promise<Bot> {
   let result = bot
-  if (result.position === undefined) {
-    return result
-  }
 
   const distX = position.x - result.position.x
   const distY = position.y - result.position.y

@@ -4,7 +4,8 @@
     "strict": true
   },
   "imports": {
-    "fs/": "https://deno.land/std@0.187.0/fs/"
+    "fs/": "https://deno.land/std@0.187.0/fs/",
+    "sleep/": "https://deno.land/x/sleep@v1.2.1/"
   },
   "tasks": {
     "start": "deno run --allow-env=PAINTBOTS_URL --allow-read=botConfig.cfg --allow-write=botConfig.cfg --allow-net src/index.ts",
@@ -17,7 +18,7 @@
     "rules": {
       "tags": ["recommended"],
       "include": ["ban-untagged-todo"],
-      "exclude": ["no-unused-vars"]
+      "exclude": ["no-unused-vars", "no-explicit-any"]
     }
   },
   "fmt": {
